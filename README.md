@@ -183,23 +183,23 @@ export PDF_PARSER_URL=http://127.0.0.1:8002/mcp/parse
 
 ## 📊 Metrics & Performance
 
-### Benchmarked Performance (Local LLM Mode)
+### Benchmarked Performance
 
-| Metric | Value | Target |
-|--------|-------|--------|
-| **Retrieval Precision@5** | 80-90% | >60% |
-| **Tool Selection Accuracy** | 90-95% | >85% |
-| **Tool Success Rate** | 95%+ | >90% |
-| **Avg End-to-End Latency** | ~500ms | <2000ms |
-| **Cost per Query** | $0 | Free |
+| Metric | Keyword Mode | Local LLM Mode | Target |
+|--------|-------------|----------------|--------|
+| **Tool Selection Accuracy** | 100% | 100% | >85% |
+| **Tool Success Rate** | 100% | 100% | >90% |
+| **Avg Retrieval Latency** | 69ms | 85ms | <100ms |
+| **Avg End-to-End Latency** | 208ms | ~26s | <2000ms |
+| **Cost per Query** | $0 | $0 | Free |
 
 ### Mode Comparison
 
-| Mode | Accuracy | Latency | Cost |
-|------|----------|---------|------|
-| **Keyword** | 85-90% | ~50ms | $0 |
-| **Local LLM** ⭐ | 90-95% | ~500ms | $0 |
-| **OpenAI** | 95-98% | ~800ms | ~$0.0004 |
+| Mode | Accuracy | Latency | Cost | Best For |
+|------|----------|---------|------|----------|
+| **Keyword** ⭐ | 100% | ~200ms | $0 | Production, low latency |
+| **Local LLM** | 100% | ~26s | $0 | Development, no API |
+| **OpenAI** | 95-98% | ~800ms | ~$0.0004 | Highest accuracy |
 
 Run `python benchmark.py --mode comparison --save` for detailed analysis.
 

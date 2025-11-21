@@ -23,6 +23,11 @@ from typing import List, Dict, Tuple
 from statistics import mean, stdev
 import requests
 
+# Fix Windows console encoding for emojis
+if sys.platform == 'win32':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+
 # Add agent directory to path
 agent_dir = os.path.join(os.path.dirname(__file__), 'agent')
 if agent_dir not in sys.path:
