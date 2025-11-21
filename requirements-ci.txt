@@ -1,0 +1,25 @@
+langchain
+langchain-chroma
+langchain-community
+langchain-core
+langchain-huggingface
+chromadb
+openai
+fastapi
+uvicorn
+streamlit
+requests
+python-dotenv
+matplotlib
+sentence-transformers
+numexpr
+pypdf
+pillow
+pytest
+pytest-cov
+
+# Local LLM support (CPU-only for CI)
+transformers>=4.35.0
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.0.0
+accelerate>=0.24.0
