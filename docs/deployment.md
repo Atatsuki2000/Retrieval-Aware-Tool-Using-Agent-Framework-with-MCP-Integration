@@ -72,12 +72,57 @@ Open browser: `http://localhost:9000`
 
 ## Google Cloud Run Deployment (Optional)
 
+Deploy all MCP tools to Google Cloud Run using the automated deployment script.
+
 ### Prerequisites
 - Google Cloud Platform account
-- gcloud CLI installed
-- Docker installed
+- gcloud CLI installed ([installation guide](https://cloud.google.com/sdk/docs/install))
 
-### Step 1: Create Dockerfiles
+### Quick Start (Automated Deployment)
+
+**Step 1: Authenticate with Google Cloud**
+```bash
+# Login to Google Cloud
+gcloud auth login
+
+# Set your project ID
+gcloud config set project YOUR_PROJECT_ID
+
+# Enable required APIs
+gcloud services enable run.googleapis.com
+gcloud services enable cloudbuild.googleapis.com
+```
+
+**Step 2: Deploy All Services**
+```bash
+# Run the automated deployment script
+bash deploy-cloud-run.sh
+```
+
+The script will:
+- Deploy plot-service, calculator, and pdf-parser to Cloud Run
+- Configure each service with 512Mi memory, 1 CPU, 60s timeout
+- Set up auto-scaling (0-10 instances)
+- Output service URLs for configuration
+
+**Step 3: Update Agent Configuration**
+
+The script outputs environment variables. Add to your `.env` file:
+```bash
+PLOT_SERVICE_URL=https://plot-service-xxx.run.app/mcp/plot
+CALCULATOR_URL=https://calculator-xxx.run.app/mcp/calculate
+PDF_PARSER_URL=https://pdf-parser-xxx.run.app/mcp/parse
+```
+
+Or configure in Streamlit sidebar.
+
+---
+
+### Manual Deployment (Advanced)
+
+If you prefer manual control over the deployment process:
+
+#### Step 1: Review Dockerfiles
 
 **tools/plot-service/Dockerfile:**
 ```dockerfile
@@ -145,10 +190,10 @@ pypdf==5.1.0
 pydantic==2.5.3
 ```
 
-### Step 2: Build and Push Docker Images
+#### Step 2: Deploy Each Service Manually
 
 ```bash
-# Set project ID
+# Set project ID and region
 export PROJECT_ID=your-gcp-project-id
 export REGION=us-central1
 
@@ -159,40 +204,48 @@ gcloud config set project $PROJECT_ID
 # Enable required APIs
 gcloud services enable cloudbuild.googleapis.com
 gcloud services enable run.googleapis.com
-gcloud services enable containerregistry.googleapis.com
 
-# Build and deploy plot-service
+# Deploy plot-service
 cd tools/plot-service
-gcloud builds submit --tag gcr.io/$PROJECT_ID/plot-service
 gcloud run deploy plot-service \
-  --image gcr.io/$PROJECT_ID/plot-service \
+  --source . \
   --platform managed \
   --region $REGION \
   --allow-unauthenticated \
-  --port 8080
+  --memory 512Mi \
+  --cpu 1 \
+  --timeout 60 \
+  --max-instances 10 \
+  --min-instances 0
 
-# Build and deploy calculator
+# Deploy calculator
 cd ../calculator
-gcloud builds submit --tag gcr.io/$PROJECT_ID/calculator
 gcloud run deploy calculator \
-  --image gcr.io/$PROJECT_ID/calculator \
+  --source . \
   --platform managed \
   --region $REGION \
   --allow-unauthenticated \
-  --port 8080
+  --memory 512Mi \
+  --cpu 1 \
+  --timeout 60 \
+  --max-instances 10 \
+  --min-instances 0
 
-# Build and deploy pdf-parser
+# Deploy pdf-parser
 cd ../pdf-parser
-gcloud builds submit --tag gcr.io/$PROJECT_ID/pdf-parser
 gcloud run deploy pdf-parser \
-  --image gcr.io/$PROJECT_ID/pdf-parser \
+  --source . \
   --platform managed \
   --region $REGION \
   --allow-unauthenticated \
-  --port 8080
+  --memory 512Mi \
+  --cpu 1 \
+  --timeout 60 \
+  --max-instances 10 \
+  --min-instances 0
 ```
 
-### Step 3: Get Service URLs
+#### Step 3: Get Service URLs
 
 ```bash
 # Get deployed URLs
@@ -200,17 +253,6 @@ gcloud run services describe plot-service --region $REGION --format 'value(statu
 gcloud run services describe calculator --region $REGION --format 'value(status.url)'
 gcloud run services describe pdf-parser --region $REGION --format 'value(status.url)'
 ```
-
-### Step 4: Update Frontend Configuration
-
-Set environment variables with Cloud Run URLs:
-```bash
-export PLOT_SERVICE_URL=https://plot-service-xxx.run.app/mcp/plot
-export CALCULATOR_URL=https://calculator-xxx.run.app/mcp/calculate
-export PDF_PARSER_URL=https://pdf-parser-xxx.run.app/mcp/parse
-```
-
-Or configure in Streamlit sidebar.
 
 ---
 
