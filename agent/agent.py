@@ -52,10 +52,8 @@ class SimpleAgent:
                     assert hf_pipeline is not None
                     self.local_llm = hf_pipeline(
                         "text-generation",
-                        model="microsoft/Phi-3.5-mini-instruct",  # 3.8B params, faster & more accurate
-                        device_map="auto",
-                        max_new_tokens=100,
-                        trust_remote_code=True
+                        model="TinyLlama/TinyLlama-1.1B-Chat-v1.0",  # 1.1B params, ~2GB
+                        device_map="auto"
                     )
                     print("✅ Local LLM loaded successfully!")
                 except Exception as e:
@@ -136,40 +134,22 @@ Respond with ONLY JSON."""
         # Use local HuggingFace model
         if self.llm_model == "local" and self.local_llm:
             try:
-                # Format prompt for Phi-3.5 chat model
-                chat_prompt = f"""<|system|>
-You are a tool selection assistant. Analyze the user's query and select the appropriate tool.<|end|>
-<|user|>
-{prompt}<|end|>
-<|assistant|>
-"""
-                response = self.local_llm(chat_prompt, max_new_tokens=120, temperature=0.1, do_sample=False)[0]['generated_text']
-                
-                # Extract JSON from response
-                # Look for JSON block with a "tool" field
-                json_match = re.search(r'\{\s*"tool"[^}]+\}', response)
-                if json_match:
-                    try:
-                        parsed = json.loads(json_match.group(0))
-                        tool = parsed.get("tool", "none").strip().lower()
-                        if tool not in {"plot", "calculator", "pdf", "none"}:
-                            tool = "none"
-                        reasoning = parsed.get("reasoning", "LLM JSON parsed")[:200]
-                        return {"tool": tool, "reasoning": reasoning}
-                    except Exception:
-                        # fall back below
-                        pass
+                # Simplified prompt that works with TinyLlama
+                chat_prompt = f"""Select tool for: {user_query}
+Options: calculator, plot, pdf, none
+Answer: """
+                response = self.local_llm(chat_prompt, max_new_tokens=50, temperature=0.1, do_sample=True)[0]['generated_text']
+
+                # Direct keyword detection in response
+                response_lower = response.lower()
+                if 'calculator' in response_lower or 'calculate' in response_lower:
+                    return {"tool": "calculator", "reasoning": "TinyLlama selected calculator"}
+                elif 'plot' in response_lower or 'visual' in response_lower or 'chart' in response_lower or 'graph' in response_lower:
+                    return {"tool": "plot", "reasoning": "TinyLlama selected plot"}
+                elif 'pdf' in response_lower:
+                    return {"tool": "pdf", "reasoning": "TinyLlama selected PDF"}
                 else:
-                    # Fallback: simple keyword detection in response
-                    response_lower = response.lower()
-                    if 'calculator' in response_lower or 'calculate' in response_lower:
-                        return {"tool": "calculator", "reasoning": "Local LLM detected calculation intent"}
-                    elif 'plot' in response_lower or 'visual' in response_lower:
-                        return {"tool": "plot", "reasoning": "Local LLM detected visualization intent"}
-                    elif 'pdf' in response_lower:
-                        return {"tool": "pdf", "reasoning": "Local LLM detected PDF intent"}
-                    else:
-                        return {"tool": "none", "reasoning": "Local LLM suggests no tool needed"}
+                    return {"tool": "none", "reasoning": "TinyLlama selected none"}
                         
             except Exception as e:
                 print(f"Local LLM tool selection failed: {e}")
