@@ -4,7 +4,7 @@ import requests
 import json
 import time
 from typing import Optional, Callable
-from retriever import get_top_k
+from .retriever import get_top_k
 
 # Optional: Local LLM support
 pipeline: Optional[Callable] = None

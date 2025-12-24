@@ -23,3 +23,8 @@ pytest-cov
 transformers>=4.35.0
 torch>=2.0.0
 accelerate>=0.24.0
+
+# KB Upload System dependencies
+unstructured>=0.10.0  # For Markdown and other formats
+python-docx>=0.8.11   # For DOCX support
+python-multipart>=0.0.6  # For file uploads in FastAPI

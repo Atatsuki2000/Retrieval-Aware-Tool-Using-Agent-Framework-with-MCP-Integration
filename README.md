@@ -2,22 +2,34 @@
 
 A production-ready system combining **Retrieval-Augmented Generation (RAG)**, **Model Context Protocol (MCP)** tools, and **autonomous agent orchestration** to create an intelligent assistant that retrieves context and invokes specialized tools.
 
+> **🎉 NEW: Knowledge Base Upload System!** Upload your own documents (PDF, DOCX, TXT, MD) to create personalized knowledge assistants. [See what's new →](docs/whats-new.md)
+
 ## 🎯 Features
 
-- **RAG System**: Retrieves relevant documents using HuggingFace embeddings and Chroma vector store
-- **MCP Tools** (deployed to Google Cloud Run):
+### Core Capabilities
+- **📚 User Knowledge Base Upload**: Upload your own documents (PDF, DOCX, TXT, MD) to create personalized knowledge assistants
+- **🔍 RAG System**: Retrieves relevant documents using HuggingFace embeddings and Chroma vector store
+- **🛠️ MCP Tools** (deployed to Google Cloud Run):
   - 🎨 `plot-service`: Mathematical functions (sin, cos, tan, etc.) + categorical visualizations
   - 🔢 `calculator`: Safe mathematical expression evaluation
   - 📄 `pdf-parser`: Extract text from PDF documents
-- **Dual-Mode Agent Orchestration**:
+- **🤖 Dual-Mode Agent Orchestration**:
   - ⚡ **Keyword-based** (517ms avg): Fast, deterministic, zero cost
   - 🧠 **Local LLM with TinyLlama** (1.9s avg): Optimized inference, no API needed
   - 🤖 **OpenAI GPT-3.5** (optional): Highest accuracy, requires paid API
-- **Interactive UI**: Streamlit frontend for real-time interaction
-- **Production-Ready**: Deployed to Cloud Run, 100% free tier compatible
-- **Optimized Performance**: 13.7x LLM speedup (26s → 1.9s)
-- **Error Handling**: Robust retry logic and graceful error recovery
-- **CI/CD**: Automated testing with GitHub Actions
+
+### User Experience
+- **🎨 Enhanced Web UI**: Drag-and-drop document upload, collection management, real-time chat
+- **📊 Collection Management**: Organize documents by topic, view statistics, track usage
+- **🌐 Multi-Format Support**: PDF, Word, Text, Markdown documents
+- **🔐 User-Specific Collections**: Isolated knowledge bases for different use cases
+
+### Production Features
+- **☁️ Cloud-Ready**: Deployed to Google Cloud Run, 100% free tier compatible
+- **⚡ Optimized Performance**: 13.7x LLM speedup (26s → 1.9s)
+- **🛡️ Error Handling**: Robust retry logic and graceful error recovery
+- **🔄 CI/CD**: Automated testing with GitHub Actions
+- **📡 REST API**: Full-featured API for programmatic access
 
 ## 📋 Architecture
 
@@ -55,7 +67,25 @@ pip install -r requirements.txt
 
 ### Quick Start
 
-**Option 1: Docker Compose (Easiest)**
+**🚀 Option 1: One-Click Startup (Recommended)**
+```bash
+# Windows - Starts all services including KB system
+.\start_kb_system.ps1
+
+# Linux/Mac - Traditional startup
+./start_services.sh
+```
+
+This automatically starts:
+- ✅ Plot Service (port 8000)
+- ✅ Calculator (port 8001)
+- ✅ PDF Parser (port 8002)
+- ✅ **Knowledge Base API (port 8100)** ← New!
+- ✅ **Enhanced Web UI (port 9001)** ← New!
+
+Your browser will open to the enhanced interface automatically!
+
+**🐳 Option 2: Docker Compose**
 ```bash
 # Start all services with Docker
 docker-compose up -d --build
