@@ -15,11 +15,13 @@ coverage.xml
 htmlcov/
 .pytest_cache/
 
-# Database
-db/chroma/*.sqlite3
-db/chroma/*.sqlite3-*
-db/test_chroma/
-db/test_chroma_dup/
+# Database files (ChromaDB)
+*.sqlite3
+*.sqlite3-*
+db/chroma/
+agent/db/chroma/
+frontend/db/chroma/
+kb_storage/
 
 # Virtual environment
 .venv/
